@@ -13,11 +13,12 @@ ip_dict = {}
 
 join_pattern = r"\[(\d{2}:\d{2}:\d{2})\] \[Server thread/INFO\]: ([^\[]+)\[([^:]+):\d+\] logged in"
 left_pattern = r"\[(\d{2}:\d{2}:\d{2})\] \[[^\]]+\]: ([^\s]+) left the game"
-remove_pattern = r" \(formerly known as [^\)]+\)"  
+remove_pattern = r" \(formerly known as [^\)]+\)"
+
 
 def main():
     global a, b, n
-    ip  = False
+    ip = False
     for file in file_list:
         if file.split(".")[-1] == "log":
             with open("../logs/"+file, mode="r") as f:
@@ -30,7 +31,8 @@ def main():
                             time_data = match.group(1)
                             username = match.group(2)
                             ip_addr = match.group(3)
-                            add_list("joined", time_data, username, ip_addr[1:])
+                            add_list("joined", time_data,
+                                     username, ip_addr[1:])
                         else:
                             print("時刻データとユーザー名が見つかりませんでした")
                             print(l)
@@ -52,7 +54,6 @@ def main():
                         ip = False
                         ip_dict[file] = l
 
-    
     count_home = []
     count_school = []
     for i in play_time.keys():
@@ -61,8 +62,9 @@ def main():
         e = [int(i//1800) for i in e]
         count_home += d
         count_school += e
-    
+
     plot_time_diffs(count_home, count_school)
+
 
 def add_list(status, time_data, username, ip=None):
     if status == "joined":
@@ -115,22 +117,26 @@ def calculate_time_diff(data):
 def plot_time_diffs(time_diffs_home, time_diffs_school):
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
-    axes[0].hist(time_diffs_home, bins=48, color='blue', alpha=0.7, log=True, range=(0, 48))
-    axes[1].hist(time_diffs_school, bins=48, color='red', alpha=0.7, log=True, range=(0, 48))
+    axes[0].hist(time_diffs_home, bins=48, color='blue',
+                 alpha=0.7, log=True, range=(0, 48))
+    axes[1].hist(time_diffs_school, bins=48, color='red',
+                 alpha=0.7, log=True, range=(0, 48))
 
-    axes[0].set_title('Home')
-    axes[0].set_xlabel('Time Bins')
+    axes[0].set_title('Other')
+    axes[0].set_xlabel('Play Time')
     axes[0].set_ylabel('Frequency (log scale)')
     axes[0].grid(True)
     axes[0].set_xticks([i for i in range(0, 49, 2)])
-    axes[0].set_xticklabels([str(i//2) if i%2==0 else "" for i in range(0, 49, 2)])
+    axes[0].set_xticklabels(
+        [str(i//2) if i % 2 == 0 else "" for i in range(0, 49, 2)])
 
-    axes[1].set_title('School')
-    axes[1].set_xlabel('Time Bins')
+    axes[1].set_title('University')
+    axes[1].set_xlabel('Play Time')
     axes[1].set_ylabel('Frequency (log scale)')
     axes[1].grid(True)
     axes[1].set_xticks([i for i in range(0, 49, 2)])
-    axes[1].set_xticklabels([str(i//2) if i%2==0 else "" for i in range(0, 49, 2)])
+    axes[1].set_xticklabels(
+        [str(i//2) if i % 2 == 0 else "" for i in range(0, 49, 2)])
 
     plt.tight_layout()
     plt.show()

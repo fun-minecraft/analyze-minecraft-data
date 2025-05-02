@@ -2,22 +2,23 @@ import json
 import os
 import pandas as pd
 
-uuids = []
+# uuids = []
 plan_users = pd.read_csv("../ex_datas/plan_users.csv")
-    
+
 with open("../entity_data/enemy", "r") as f:
-    enemy_entities = [i.replace("\n","") for i in f]
+    enemy_entities = [i.replace("\n", "") for i in f]
 
 with open("../entity_data/friend", "r") as f:
-    friend_entities = [i.replace("\n","") for i in f]
+    friend_entities = [i.replace("\n", "") for i in f]
 
 
 # データの書き込み
 with open("../output/playdata.csv", "w") as playdata:
-    playdata.write("name,mined_block,move(m),playtime(s),kill_num,enemy_kill_num,friend_kill_num\n")
+    playdata.write(
+        "name,mined_block,move(m),playtime(s),kill_num,enemy_kill_num,friend_kill_num\n")
     for i in plan_users.id:
-        filename = "../stats/" + plan_users[plan_users.id == i].uuid.values[0] + ".json"
-
+        filename = "../stats/" + \
+            plan_users[plan_users.id == i].uuid.values[0] + ".json"
 
         with open(filename, "r") as f:
             # 掘ったブロック数
@@ -25,7 +26,8 @@ with open("../output/playdata.csv", "w") as playdata:
             print(plan_users[plan_users.id == i].name.values[0], end=",")
             player_name = plan_users[plan_users.id == i].name.values[0]
             try:
-                print("破壊したブロック数",sum(data["stats"]["minecraft:mined"].values()), end=",")
+                print("破壊したブロック数", sum(
+                    data["stats"]["minecraft:mined"].values()), end=",")
                 mined_block = sum(data["stats"]["minecraft:mined"].values())
             except:
                 # もしデータがなかったらNaNで埋める
@@ -48,20 +50,20 @@ with open("../output/playdata.csv", "w") as playdata:
                 "minecraft:minecart_one_cm",
                 "minecraft:pig_one_cm",
                 "minecraft:strider_one_cm"
-                ]
+            ]
             for j in value:
                 try:
                     move_cm += data["stats"]["minecraft:custom"][j]
                 except:
                     pass
             # cm単位だけど10cmごとにカウントされているよう
-            print("移動距離",move_cm//10,"m", end=",")
+            print("移動距離", move_cm//10, "m", end=",")
             mive_m = move_cm//10
 
             # プレイ時間 なぜか20で割らないといけない。tick単位な気がする
             # ver1.16.5まではminecraft:play_one_minute
             playtime = data["stats"]["minecraft:custom"]["minecraft:play_time"]//20
-            print("プレイ時間",playtime,"秒", end=",")
+            print("プレイ時間", playtime, "秒", end=",")
 
             # kill数
             try:
@@ -83,6 +85,7 @@ with open("../output/playdata.csv", "w") as playdata:
                     friend_kill += data["stats"]["minecraft:killed"]["minecraft:"+k]
                 except:
                     pass
-            print("kill数",kill_all,"敵対的モブ",enemy_kill,"友好的モブ",friend_kill)
+            print("kill数", kill_all, "敵対的モブ", enemy_kill, "友好的モブ", friend_kill)
             # 書き込み
-            playdata.write(player_name + "," + str(mined_block) + "," + str(mive_m) + "," + str(playtime) + "," + str(kill_all) + "," + str(enemy_kill) + "," + str(friend_kill) +"\n")
+            playdata.write(player_name + "," + str(mined_block) + "," + str(mive_m) + "," + str(
+                playtime) + "," + str(kill_all) + "," + str(enemy_kill) + "," + str(friend_kill) + "\n")
